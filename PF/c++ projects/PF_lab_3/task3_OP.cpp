@@ -5,13 +5,11 @@ int main()
 	float length;
 	float width;
 	float area ;
-	cout << "enter length : ..";
+	cout << "Enter the length of the rectangle: ";
 	cin >> length;
-	cout << "enter width : ..";
+	cout << "Enter the width of the rectangle: ";
 	cin >> width;
 	area = width * length ;
-	cout << "_________________________________"<<endl;
-	cout << "=> area is:";
+	cout << "The area of the rectangle is: ";
 	cout << area <<endl;
-	cout << "_________________________________"<<endl;
 }

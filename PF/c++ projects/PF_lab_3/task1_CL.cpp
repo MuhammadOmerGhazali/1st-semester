@@ -6,17 +6,18 @@ int main()
 	int roll_num;
 	float aggregate;
 	string section;
-	cout << "enter name : "; 
+	cout << "Enter your name: "; 
 	cin >> name ;
-	cout << "enter your aggragate : ";
+	cout << "Enter your roll number: ";
+	cin >> roll_num ;
+	cout << "Enter your aggregate: ";
 	cin >> aggregate ;
-	cout << "enter section : ";
+	cout << "Enter your section: ";
 	cin >> section ;
-	cout << "Student Information "<<endl;
-	cout << "_________________________________"<<endl;
-	cout <<"=> Name : "<< name<<endl;
-	cout <<"=> Roll number"<<roll_num << endl;
-	cout <<"=> Aggregate : "<<aggregate <<endl; 
-	cout <<"=> Section : "<<section <<endl;
-	cout << "_________________________________"<<endl;
+	cout << "Student Information:"<<endl;
+	cout <<"Name: "<< name<<endl;
+	cout <<"Roll number: "<<roll_num << endl;
+	cout <<"Aggregate: "<<aggregate <<endl; 
+	cout <<"Section: "<<section <<endl;
+
 }

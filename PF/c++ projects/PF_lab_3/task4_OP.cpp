@@ -5,13 +5,12 @@ int main()
 	float charge;
 	float current;
 	float time ;
-	cout << "enter charge : ..";
-	cin >> charge;
-	cout << "enter time : ..";
-	cin >> time;
+	cout << "Enter the charge (Q) in Coulombs: ";
+	cin >>charge;
+	cout << "Enter the time (t) in seconds: ";
+	cin >>time;
 	current = charge / time ;
-	cout << "_________________________________"<<endl;
-	cout << "=> current is:";
-	cout << current <<endl;
-	cout << "_________________________________"<<endl;
+	cout << "The current (I) is: ";
+	cout <<current;
+	cout << " Amperes.";
 }
