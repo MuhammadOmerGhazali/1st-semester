@@ -3,13 +3,13 @@ using namespace std;
 float Discount(string x , float y);
 int main()
 {
-string country_name;
-float price;
-cout<<"Enter the country's name: ";
-cin>>country_name;
-cout<<"Enter the ticket price in dollars: $";
-cin>>price;
-Discount(country_name,price);
+	string country_name;
+	float price;
+	cout<<"Enter the country's name: ";
+	cin>>country_name;
+	cout<<"Enter the ticket price in dollars: $";
+	cin>>price;
+	Discount(country_name,price);
 }
 
 float Discount(string country_name , float price)
