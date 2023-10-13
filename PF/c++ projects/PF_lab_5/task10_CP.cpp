@@ -1,7 +1,10 @@
 #include <iostream>
 #include <cmath>
+
 using namespace std;
+
 string numbertowords(int number);
+
 main()
 {	int number;
 	cout << "Enter a number (1-99): ";
