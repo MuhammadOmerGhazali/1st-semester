@@ -20,17 +20,22 @@ void random_map_coordinates();
 void print_score();
 void update_score();
 void score_ball_spawner();
+void print_score_ball();
 
 /*player functions functions declaration*/
 void print_player();
 void erase_player();
 void move_player();
+bool check_player_collisions();
+bool player_movement_dictionary(char x);
 
 
 /*enemy functions functions declaration*/
 void erase_enemy();
 void move_spiky_boi();
 void print_spiky_boi();
+bool check_enemy_collisions();
+bool enemy_movement_dictionary(char x);
 
 /*test cases*/
 void test_case();
@@ -38,10 +43,12 @@ void test_case();
 /*player var*/
 int pX = 5,pY = 5;
 char player_direction;
+bool player_movable = false ;
 int gX =5 ,gY =5;
 
 /* enemy common var */
 int eX = 2,eY = 2;
+bool enemy_movable = false ;
 
 /*spiky boi var*/
 int sX = 7,sY = 5;
@@ -57,7 +64,7 @@ int rand_X_map,rand_Y_map;
 /*score variables*/
 int current_score=0;
 int scoreX , scoreY;
-bool score_ball_eaten= false ;
+bool score_ball_eaten= true ;
 
 
 
@@ -68,7 +75,6 @@ int main()
     ready();
     print_spiky_boi();
     print_player();
-
     /*Game loop will replace by void update later*/
     
     while (true)
@@ -77,6 +83,7 @@ int main()
         getch();
         move_player();
         move_spiky_boi();
+
         test_case();
         print_score();
     }
@@ -191,7 +198,16 @@ void update_score()
 }
 void score_ball_spawner()
 {
-    
+    random_map_coordinates();
+    scoreX = rand_X_map;
+    scoreY = rand_Y_map;
+    print_score_ball();
+
+}
+void print_score_ball()
+{
+    gotoxy(scoreX,scoreY);
+    cout << ".";
 }
 
 /*maze functions*/
@@ -237,33 +253,81 @@ void move_player()
 {
     erase_player();
 
-    if ((getCharAtxy(pX-1,pY) == ' ' ) && (GetAsyncKeyState(VK_LEFT)))
+    if(GetAsyncKeyState(VK_LEFT))
     {
-        pX=pX-1;
         player_direction='L';
+        if ((check_player_collisions() == true))
+            pX = pX-1;
+        
     }
 
-    if ((getCharAtxy(pX+1,pY) == ' ' ) && (GetAsyncKeyState(VK_RIGHT)))
+    if (GetAsyncKeyState(VK_RIGHT))
     {
-        pX=pX+1;
         player_direction='R';
+        if ((check_player_collisions() == true))
+            pX=pX+1;
+        
     }
 
-    if ((getCharAtxy(pX,pY-1) == ' ' ) && (GetAsyncKeyState(VK_UP)))
+    if (GetAsyncKeyState(VK_UP))
     {
-        pY=pY-1;
         player_direction='U';
+        if (check_player_collisions() == true)
+            pY=pY-1;
+        
     }
 
-    if ((getCharAtxy(pX,pY+1) == ' ' ) && (GetAsyncKeyState(VK_DOWN)))
+    if (GetAsyncKeyState(VK_DOWN))
     {
-        pY=pY+1;
         player_direction='D';
+        if (check_player_collisions() == true)
+            pY=pY+1;
+        
 
     }
 
     print_player();
 
+}
+bool check_player_collisions()
+{
+    char check_character;
+// left input
+    if (player_direction == 'L')
+        {
+            check_character = getCharAtxy(pX-1,pY);
+            return player_movement_dictionary(check_character);
+        }
+// right input
+    if(player_direction == 'R')
+        {
+            check_character = getCharAtxy(pX+1,pY);
+            return player_movement_dictionary(check_character);
+        }
+// up input 
+
+    if(player_direction == 'U')
+        {
+            check_character = getCharAtxy(pX,pY-1);
+            return player_movement_dictionary(check_character);
+        }
+// down input
+
+    if(player_direction == 'D')
+        {
+            check_character = getCharAtxy(pX,pY+1);
+            return player_movement_dictionary(check_character);
+        }
+
+}
+bool player_movement_dictionary(char check_character)
+{
+    if (check_character == ' ')
+                return player_movable = true;
+            else if (check_character == '.')
+                return player_movable = true;
+            else 
+                return player_movable =false;
 }
 
 /*enemy function bodies*/
@@ -378,7 +442,72 @@ void move_spiky_boi()
     }
 
     print_spiky_boi();
+}
+bool check_enemy_collisions()
+{
+     char check_character;
+// left movement
+    if (sDir == '4')
+        {
+            check_character = getCharAtxy(sX-1,sY);
+            return enemy_movement_dictionary(check_character);
+        }
+// right movement
+    if (sDir == '6')
+        {
+            check_character = getCharAtxy(sX+1,sY);
+            return enemy_movement_dictionary(check_character);
+        }
+// up movement
 
+    if (sDir == '8')
+        {
+            check_character = getCharAtxy(sX,sY-1);
+            return enemy_movement_dictionary(check_character);
+        }
+// down movement
+    if (sDir == '2')
+        {
+            check_character = getCharAtxy(sX,sY+1);
+            return enemy_movement_dictionary(check_character);
+        }
+// upleft movement
+    if (sDir == '7')
+        {
+            check_character = getCharAtxy(sX-1,sY-1);
+            return enemy_movement_dictionary(check_character);
+        }
+
+// upright movement
+    if (sDir == '9')
+        {
+            check_character = getCharAtxy(sX+1,sY-1);
+            return enemy_movement_dictionary(check_character);
+        }
+
+//downleft movement
+    if (sDir == '1')
+        {
+            check_character = getCharAtxy(sX-1,sY+1);
+            return enemy_movement_dictionary(check_character);
+        }
+// downright movement
+    if (sDir == '3')
+        {
+            check_character = getCharAtxy(sX+1,sY+1);
+            return enemy_movement_dictionary(check_character);
+        }
+
+
+}
+bool enemy_movement_dictionary(char check_character)
+{
+    if (check_character == ' ')
+                return enemy_movable = true;
+            else if (check_character == '.')
+                return enemy_movable = false;
+            else 
+                return enemy_movable =false;
 }
 
 /*test cases function bodies. dont mind .for debugging*/
@@ -397,6 +526,3 @@ void test_case()
  gotoxy(55, 9);
  cout <<" random= "<<rand_num<<endl;
 }
-
-
-
