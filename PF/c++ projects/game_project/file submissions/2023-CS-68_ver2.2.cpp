@@ -354,7 +354,8 @@ void erase_enemy()
     gotoxy(eX,eY);
     cout<<" ";
 }
-void move_spiky_boi()
+void
+ move_spiky_boi()
 {
     eX = sX;
     eY = sY;

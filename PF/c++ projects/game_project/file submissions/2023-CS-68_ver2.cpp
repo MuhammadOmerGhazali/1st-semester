@@ -83,8 +83,9 @@ int main()
         
         move_player();
         move_spiky_boi();
-        if ((pX == scoreX && pY == scoreY))
-            update_score();
+        update_score();
+        if (score_ball_eaten == true)
+            score_ball_spawner();
 
         test_case();
         print_score();
@@ -193,18 +194,17 @@ void print_score()
 }
 void update_score()
 {
-    current_score = current_score + 1;
-    score_ball_spawner();
-        
+    if (scoreX == pX && scoreY == pY)
+        {
+            current_score = current_score + 1;
+            score_ball_eaten = true;
+        }
 }
 void score_ball_spawner()
 {
-    srand(time(0));
-    scoreX = rand() % maze_l;
-    srand(time(0));
-    scoreY = rand() % maze_h;
-    if (getCharAtxy(scoreX,scoreY) != ' ')
-        score_ball_spawner();
+    random_map_coordinates();
+    scoreX = rand_X_map;
+    scoreY = rand_Y_map;
     print_score_ball();
 
 }
@@ -354,7 +354,8 @@ void erase_enemy()
     gotoxy(eX,eY);
     cout<<" ";
 }
-void move_spiky_boi()
+void
+ move_spiky_boi()
 {
     eX = sX;
     eY = sY;
