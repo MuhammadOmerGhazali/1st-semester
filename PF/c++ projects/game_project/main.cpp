@@ -13,7 +13,7 @@ void gotoxy(int x ,int y);
 char getCharAtxy(short int x, short int y);
 
 //random number generator functions
-void random_diagonal_dir();
+int random_diagonal_dir();
 void random_map_coordinates();
 
 /*Score functions*/
@@ -51,6 +51,7 @@ int eX = 2,eY = 2;
 bool enemy_movable = false ;
 
 /*spiky boi var*/
+int spiky_boi_life =0 ;
 int sX = 7,sY = 5;
 int sDir = 1;
 bool sFrame =true ;
@@ -103,18 +104,23 @@ void ready()
 {
     system("cls");
 
-    cout<< "                                  "<<endl;
-    cout<< "                                  "<<endl;
-    cout<< "                                  "<<endl;
-    cout<< "                                  "<<endl;
-    cout<< "            GAME START            "<<endl;
-    cout<< "                                  "<<endl;
-    cout<< "                                  "<<endl;
-    cout<< "                                  "<<endl;
-    cout<< "    press any key to continue     "<<endl;
-
+    cout << ".----------------------------------------------------------------------------------------------------------. " << endl ;
+    cout << "| /$$$$$$$   /$$$$$$   /$$$$$$  /$$   /$$ /$$$$$$$$        /$$$$$$  /$$        /$$$$$$  /$$   /$$ /$$$$$$$$| " << endl ;
+    cout << "|| $$__  $$ /$$__  $$ /$$__  $$| $$  | $$| $$_____/       /$$__  $$| $$       /$$__  $$| $$$ | $$| $$_____/| " << endl ;
+    cout << "|| $$  \\ $$| $$  \\ $$| $$  \\__/| $$  | $$| $$            | $$  \\__/| $$      | $$  \\ $$| $$$$| $$| $$      | " << endl ;
+    cout << "|| $$$$$$$/| $$  | $$| $$ /$$$$| $$  | $$| $$$$$         | $$      | $$      | $$  | $$| $$ $$ $$| $$$$$   | " << endl ;
+    cout << "|| $$__  $$| $$  | $$| $$|_  $$| $$  | $$| $$__/         | $$      | $$      | $$  | $$| $$  $$$$| $$__/   | " << endl ;
+    cout << "|| $$  \\ $$| $$  | $$| $$  \\ $$| $$  | $$| $$            | $$    $$| $$      | $$  | $$| $$\\  $$$| $$      | " << endl ;
+    cout << "|| $$  | $$|  $$$$$$/|  $$$$$$/|  $$$$$$/| $$$$$$$$      |  $$$$$$/| $$$$$$$$|  $$$$$$/| $$ \\  $$| $$$$$$$$| " << endl ;
+    cout << "||__/  |__/ \\______/  \\______/  \\______/ |________/       \\______/ |________/ \\______/ |__/  \\__/|________/| " << endl ;
+    cout << "'----------------------------------------------------------------------------------------------------------' " << endl ;
+    cout << "                                                                                                             " << endl ;
+    cout << "                                          press any key to continue                                          " << endl ;        
+    cout << "                                                                                                             " << endl ;    
     getch();
+    
     system("cls");
+
 
     /*enemy movement test only*/
     cout<<"this is a pysduo turnbased game so enemy will move after u move"<<endl;
@@ -157,12 +163,47 @@ return ReadConsoleOutput(GetStdHandle(STD_OUTPUT_HANDLE), &ci, coordBufSize, xy,
 }
 
 //random value generators
-void random_diagonal_dir()
+int random_diagonal_dir()
 {
     srand(time(0));
     rand_dir =rand() % 9 +1;
-    if (rand_dir == 5 || rand_dir ==sDir)
-        rand_dir =rand() % 9 +1;
+    
+        if (sDir == 1)
+        {
+            while (!(rand_dir == 3 || rand_dir == 9 || rand_dir == 7))
+            {
+                srand(time(0));
+                rand_dir =rand() % 9 + 1 ;
+            }
+        }
+        else if (sDir == 3)
+        {
+            while (!(rand_dir == 1 || rand_dir == 9 || rand_dir == 7))
+            {
+                srand(time(0));
+                rand_dir =rand() % 9 + 1 ;
+            }
+        }
+        else if (sDir == 7)
+        {
+            while (!(rand_dir == 1 || rand_dir == 9 || rand_dir == 3))
+            {
+                srand(time(0));
+                rand_dir =rand() % 9 + 1 ;
+            }
+        }
+        else if (sDir == 9)
+        {
+            while (!(rand_dir == 1 || rand_dir == 3 || rand_dir == 7))
+            {
+                srand(time(0));
+                rand_dir =rand() % 9 + 1 ;
+            }
+        }
+
+    return rand_dir;
+     
+    
 
 }
 void random_map_coordinates()
@@ -171,13 +212,13 @@ void random_map_coordinates()
     rand_X_map =rand() % 100 ;
     rand_Y_map =rand() % 100 ;
     // random x coordinate
-    while (!(rand_X_map > 1 && rand_X_map < maze_l))
+    while (!(rand_X_map >= 2 && rand_X_map < maze_l))
     {
         srand(time(0));
         rand_X_map =rand() % 100 ;
     }
     // random y coordinate
-    while (!(rand_Y_map > 1 && rand_Y_map < maze_l))
+    while (!(rand_Y_map >= 2 && rand_Y_map < maze_l))
     {
         srand(time(0));
         rand_Y_map =rand() % 100 ;
@@ -360,6 +401,14 @@ void move_spiky_boi()
     eY = sY;
 
     erase_enemy();
+    if (spiky_boi_life == 100)
+    {
+        random_map_coordinates();
+        sX = rand_X_map;
+        sY = rand_Y_map;
+        sDir = random_diagonal_dir() ;
+        spiky_boi_life = 0 ;
+    }
 
 /*sDir = 4 is left movement*/
     if ((getCharAtxy(sX-1,sY) == ' ' ) && (sDir == 4))
@@ -404,7 +453,7 @@ void move_spiky_boi()
         sY = sY + 1;
         if ((getCharAtxy(sX+1,sY+1) == ' ' ) == false)
         {
-            sDir = 7;
+            sDir = random_diagonal_dir();
         }
     }
 /*sDir = 7 is upleft movement*/
@@ -414,7 +463,7 @@ void move_spiky_boi()
         sY = sY - 1;
         if ((getCharAtxy(sX-1,sY-1) == ' ' ) == false)
         {
-            sDir =3;
+            sDir = random_diagonal_dir();
         }
     }
 /*sDir = 9 is upright movement*/
@@ -425,7 +474,7 @@ void move_spiky_boi()
         if ((getCharAtxy(sX+1,sY-1) == ' ' ) == false)
         {
             
-            sDir = 1;
+            sDir = random_diagonal_dir();
         }
     }
 /*sDir = 1 is downleft movement*/
@@ -435,11 +484,14 @@ void move_spiky_boi()
         sY = sY + 1;
         if ((getCharAtxy(sX-1,sY+1) == ' ' ) == false)
         {
-            sDir = 9;
+            sDir = random_diagonal_dir();
         }
     }
 
     print_spiky_boi();
+
+    spiky_boi_life ++ ;
+
 }
 bool check_enemy_collisions()
 {
@@ -523,4 +575,8 @@ void test_case()
  cout <<" sframe= "<<sFrame<<endl;
  gotoxy(55, 9);
  cout <<" random= "<<rand_num<<endl;
+ gotoxy(55, 10);
+ cout <<" sDir= "<<sDir<<endl;
+ gotoxy(55, 10);
+ cout <<" spiky boi life "<<spiky_boi_life<<endl;
 }

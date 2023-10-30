@@ -15,25 +15,65 @@ int main()
 
 void print_aster(int rows)
 {
-    for(int i = 1 ; i <= rows ; i++)
+    for (int i = (rows-1) ; i >= 1 ; i--)
     {
         int x = 1;
-        while (x <= i)
+        while (x <= 1)
         {
-            cout << "*";
+            cout << "-";
             x++;
         }
-        cout << endl;
-    }
-
-    for(int i = rows ; i >= 1 ; i--)
-    {
-        int x = 1;
-        while (x <= i)
-        {
-            cout << "*";
-            x++;
-        }
-        cout << endl;
+        for(int z = rows ; z >= 1 ; z--)
+         {
+             int y = 1;
+             while (y <= z)
+             {
+                 cout << "*";
+                 y++;
+             }
+             cout << endl;
+         }
     }
 }
+
+// for(int i = rows ; i >= 1 ; i--)
+//     {
+//         int x = 1;
+//         while (x <= i)
+//         {
+//             cout << "-";
+//             x++;
+
+//             for(int z = rows ; z >= 1 ; z--)
+//         {
+//             int y = 1;
+//             while (y <= z)
+//             {
+//                 cout << "*";
+//                 y++;
+//             }
+//             cout << endl;
+//         }
+//         }
+        
+//     for(int i = 1 ; i <= rows ; i++)
+//     {
+//         int x = 1;
+//         while (x <= i)
+//         {
+//             cout << "-";
+//             x++;
+//         }
+//         for(int z = 1 ; z <= rows ; z++)
+//             {
+//                 int y = 1;
+//                 while (y <= z)
+//                 {
+//                     cout << "*";
+//                     y++;
+//                 }
+//                 cout << endl;
+//             }
+//     }
+
+    
