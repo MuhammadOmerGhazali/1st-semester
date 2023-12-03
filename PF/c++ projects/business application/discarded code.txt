@@ -1,0 +1,39 @@
+ascii to int
+
+int ascii_to_int(string convert_to_int)
+{
+    int temp_int;
+    char temp_char;
+    for (int x = 0;convert_to_int[x] !='\0';x++)
+    {
+        convert_to_int[x] = temp_char;
+        temp_int = (temp_char -'0');
+        x++;
+    }
+    return temp_int;
+}
+
+void ready(string username_database[], string password_database[], string user_perm[], string employee_id, bool taskdone_pr[], string tasklist_pr[])
+{
+    for (int x = 0; x < 10; x++)
+    {
+        username_database[x] = "0";
+        password_database[x] = "0";
+    }
+    for (int x = 0; x < 20; x++)
+    {
+        taskdone_pr[x] = false;
+    }
+
+    // Initialize tasklist_pr starting from index 1
+    for (int x = 1; x <= 20; x++)
+    {
+        tasklist_pr[x] = "";  // You can set the default value as needed
+    }
+
+    username_database[0] = "admin";
+    password_database[0] = "admin";
+    user_perm[0] = "admin";
+    employee_id = "0";
+
+    system("cls");
