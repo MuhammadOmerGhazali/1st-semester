@@ -1,0 +1,17 @@
+//remember to add Windows.h library
+
+void resizeConsole()
+{
+    COORD coord;
+    SMALL_RECT rect;
+    HWND console = GetConsoleWindow();
+    coord.X = 1920;
+    coord.Y = 1080;
+    rect.Left = 0;
+    rect.Top = 0;
+    rect.Right = 1919;
+    rect.Bottom = 1079;
+    SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+    SetConsoleWindowInfo(GetStdHandle(STD_OUTPUT_HANDLE), TRUE, &rect);
+    ShowWindow(console, SW_MAXIMIZE);
+}

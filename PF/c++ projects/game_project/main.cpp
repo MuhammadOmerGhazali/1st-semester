@@ -1,582 +1,170 @@
 #include <iostream>
-#include <conio.h>
 #include <windows.h>
-#include <cstdlib>
-#include <ctime>
+#include <conio.h>
 
 using namespace std;
 
-/*normal game functions declaration*/
-void ready();
-void print_maze();
-void gotoxy(int x ,int y);
-char getCharAtxy(short int x, short int y);
+//constants
+const int screen_length = 70;
+const int screen_height = 25;
 
-//random number generator functions
-int random_diagonal_dir();
-void random_map_coordinates();
+//functions
+void ready(char screen[screen_height][screen_length]);                     // initializes the game state
+void resizeConsole();
+void cursor_hide();
+void cursor_show();
+void initialize_maze(char screen[screen_height][screen_length]);           // initializes the maze 
+void printBoard(char screen[screen_height][screen_length]);
 
-/*Score functions*/
-void print_score();
-void update_score();
-void score_ball_spawner();
-void print_score_ball();
-
-/*player functions functions declaration*/
-void print_player();
-void erase_player();
-void move_player();
-bool check_player_collisions();
-bool player_movement_dictionary(char x);
+void detect_player_input();                                                // detects player input
+void move_player();                                                        // moves player
 
 
-/*enemy functions functions declaration*/
-void erase_enemy();
-void move_spiky_boi();
-void print_spiky_boi();
-bool check_enemy_collisions();
-bool enemy_movement_dictionary(char x);
-
-/*test cases*/
-void test_case();
-
-/*player var*/
-int pX = 5,pY = 5;
-char player_direction;
-bool player_movable = false ;
-int gX =5 ,gY =5;
-
-/* enemy common var */
-int eX = 2,eY = 2;
-bool enemy_movable = false ;
-
-/*spiky boi var*/
-int spiky_boi_life =0 ;
-int sX = 7,sY = 5;
-int sDir = 1;
-bool sFrame =true ;
-
-/*other var*/
-int maze_h ,maze_l;
-int rand_num;
-int rand_dir;
-int rand_X_map,rand_Y_map;
-
-/*score variables*/
-int current_score=0;
-int scoreX , scoreY;
-bool score_ball_eaten= true ;
-
+//player variables
+int player_x , player_y;
+char player_dir;
 
 
 int main()
 {
-    /*used to print menu */
+    resizeConsole();                                                        // risize console
+    cursor_hide();                                                          // hide cursor
+    char screen[screen_height][screen_length];                              // array used to print screen
+    ready(screen);                                                          // initialize and the start screen
+    bool game_over = false ;                                                // used to terminate game loop
     
-    ready();
-    score_ball_spawner();
-    print_spiky_boi();
-    print_player();
-    /*Game loop will replace by void update later*/
-    
-    while (true)
+    while(!game_over)                                                       // game loop
     {
-        
-        move_player();
-        move_spiky_boi();
-        if ((pX == scoreX && pY == scoreY))
-            update_score();
+        detect_player_input();                                              // detects player input and redirects to the required function
 
-        test_case();
-        print_score();
-        Sleep(150);
+        printBoard(screen);                                                 // print the screen
     }
     
 
-    
-
-
+    cursor_show();                                                          // show the cursor again
 }
 
-/*normal game functions bodies*/
-void ready()
-
+void ready(char screen[screen_height][screen_length])
 {
     system("cls");
-
-    cout << ".----------------------------------------------------------------------------------------------------------. " << endl ;
-    cout << "| /$$$$$$$   /$$$$$$   /$$$$$$  /$$   /$$ /$$$$$$$$        /$$$$$$  /$$        /$$$$$$  /$$   /$$ /$$$$$$$$| " << endl ;
-    cout << "|| $$__  $$ /$$__  $$ /$$__  $$| $$  | $$| $$_____/       /$$__  $$| $$       /$$__  $$| $$$ | $$| $$_____/| " << endl ;
-    cout << "|| $$  \\ $$| $$  \\ $$| $$  \\__/| $$  | $$| $$            | $$  \\__/| $$      | $$  \\ $$| $$$$| $$| $$      | " << endl ;
-    cout << "|| $$$$$$$/| $$  | $$| $$ /$$$$| $$  | $$| $$$$$         | $$      | $$      | $$  | $$| $$ $$ $$| $$$$$   | " << endl ;
-    cout << "|| $$__  $$| $$  | $$| $$|_  $$| $$  | $$| $$__/         | $$      | $$      | $$  | $$| $$  $$$$| $$__/   | " << endl ;
-    cout << "|| $$  \\ $$| $$  | $$| $$  \\ $$| $$  | $$| $$            | $$    $$| $$      | $$  | $$| $$\\  $$$| $$      | " << endl ;
-    cout << "|| $$  | $$|  $$$$$$/|  $$$$$$/|  $$$$$$/| $$$$$$$$      |  $$$$$$/| $$$$$$$$|  $$$$$$/| $$ \\  $$| $$$$$$$$| " << endl ;
-    cout << "||__/  |__/ \\______/  \\______/  \\______/ |________/       \\______/ |________/ \\______/ |__/  \\__/|________/| " << endl ;
-    cout << "'----------------------------------------------------------------------------------------------------------' " << endl ;
-    cout << "                                                                                                             " << endl ;
-    cout << "                                          press any key to continue                                          " << endl ;        
-    cout << "                                                                                                             " << endl ;    
+    cout <<"Press any key to continue...................................";
     getch();
-    
     system("cls");
-
-
-    /*enemy movement test only*/
-    cout<<"this is a pysduo turnbased game so enemy will move after u move"<<endl;
-    cout<<"4 is left movement "<<endl;
-    cout<<"6 is right movement"<<endl;
-    cout<<"2 is downward movement"<<endl;
-    cout<<"8 is upward movement "<<endl;
-    cout<<"3 is downright movement "<<endl;
-    cout<<"7 is upleft movement "<<endl;
-    cout<<"9 is upright movement "<<endl;
-    cout<<"1 is downleft movement "<<endl;
-    cout<<"enter enemy movement test case? ";
-    cin >>sDir;
-    system("cls");
-    print_maze();
-
-    /*makes player spawns in middle of map*/
-
-    pX=maze_l/2;
-    pY=maze_h/2;
-}
-void gotoxy(int x, int y)
-{
-  static HANDLE h = NULL;  
-  if(!h)
-    h = GetStdHandle(STD_OUTPUT_HANDLE);
-  COORD c = { x, y };  
-  SetConsoleCursorPosition(h,c);
-}
-char getCharAtxy(short int x, short int y)
-{
-CHAR_INFO ci;
-COORD xy = {0, 0};
-SMALL_RECT rect = {x, y, x, y};
-COORD coordBufSize;
-coordBufSize.X = 1;
-coordBufSize.Y = 1;
-return ReadConsoleOutput(GetStdHandle(STD_OUTPUT_HANDLE), &ci, coordBufSize, xy, &rect) ? ci.Char.AsciiChar
-: ' ';
+    initialize_maze(screen);
 }
 
-//random value generators
-int random_diagonal_dir()
+void resizeConsole()
 {
-    srand(time(0));
-    rand_dir =rand() % 9 +1;
-    
-        if (sDir == 1)
-        {
-            while (!(rand_dir == 3 || rand_dir == 9 || rand_dir == 7))
-            {
-                srand(time(0));
-                rand_dir =rand() % 9 + 1 ;
-            }
-        }
-        else if (sDir == 3)
-        {
-            while (!(rand_dir == 1 || rand_dir == 9 || rand_dir == 7))
-            {
-                srand(time(0));
-                rand_dir =rand() % 9 + 1 ;
-            }
-        }
-        else if (sDir == 7)
-        {
-            while (!(rand_dir == 1 || rand_dir == 9 || rand_dir == 3))
-            {
-                srand(time(0));
-                rand_dir =rand() % 9 + 1 ;
-            }
-        }
-        else if (sDir == 9)
-        {
-            while (!(rand_dir == 1 || rand_dir == 3 || rand_dir == 7))
-            {
-                srand(time(0));
-                rand_dir =rand() % 9 + 1 ;
-            }
-        }
+    COORD coord;
+    SMALL_RECT rect;
+    HWND console = GetConsoleWindow();
 
-    return rand_dir;
-     
-    
+    coord.X = 100;  
+    coord.Y = 30;   
 
+    rect.Left = 0;
+    rect.Top = 0;
+    rect.Right = coord.X - 1;   
+    rect.Bottom = coord.Y - 1;  
+
+    SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+    SetConsoleWindowInfo(GetStdHandle(STD_OUTPUT_HANDLE), TRUE, &rect);
+
+    ShowWindow(console, SW_SHOWNORMAL);
 }
-void random_map_coordinates()
+void cursor_hide()
 {
-    srand(time(0));
-    rand_X_map =rand() % 100 ;
-    rand_Y_map =rand() % 100 ;
-    // random x coordinate
-    while (!(rand_X_map >= 2 && rand_X_map < maze_l))
-    {
-        srand(time(0));
-        rand_X_map =rand() % 100 ;
-    }
-    // random y coordinate
-    while (!(rand_Y_map >= 2 && rand_Y_map < maze_l))
-    {
-        srand(time(0));
-        rand_Y_map =rand() % 100 ;
-    }
+    /*
+        For Removing Blinking Cursor on Screen
+    */
+    HANDLE hStdOut = NULL;
+    CONSOLE_CURSOR_INFO curInfo;
 
+    hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    GetConsoleCursorInfo(hStdOut, &curInfo);
+    curInfo.bVisible = FALSE;
+    SetConsoleCursorInfo(hStdOut, &curInfo);
+}
+void cursor_show()
+{
+    /*
+        For Removing Blinking Cursor on Screen
+    */
+    HANDLE hStdOut = NULL;
+    CONSOLE_CURSOR_INFO curInfo;
+
+    hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    GetConsoleCursorInfo(hStdOut, &curInfo);
+    curInfo.bVisible = TRUE;
+    SetConsoleCursorInfo(hStdOut, &curInfo);
 }
 
-/*Score function bodies*/
-void print_score()
+void detect_player_input()
 {
-    gotoxy(2,16);
-    cout << "Score = "<<current_score;
-}
-void update_score()
-{
-    current_score = current_score + 1;
-    score_ball_spawner();
-        
-}
-void score_ball_spawner()
-{
-    srand(time(0));
-    scoreX = rand() % maze_l;
-    srand(time(0));
-    scoreY = rand() % maze_h;
-    if (getCharAtxy(scoreX,scoreY) != ' ')
-        score_ball_spawner();
-    print_score_ball();
-
-}
-void print_score_ball()
-{
-    gotoxy(scoreX,scoreY);
-    cout << ".";
-}
-
-/*maze functions*/
-void print_maze()
-{
-    cout<< "####################################################"<<endl;
-    cout<< "#                                                  #"<<endl;
-    cout<< "#                                                  #"<<endl;
-    cout<< "#                                                  #"<<endl;
-    cout<< "#                                                  #"<<endl;
-    cout<< "#                                                  #"<<endl;
-    cout<< "#                                                  #"<<endl;
-    cout<< "#                                                  #"<<endl;
-    cout<< "#                                                  #"<<endl;
-    cout<< "#                                                  #"<<endl;
-    cout<< "#                                                  #"<<endl;
-    cout<< "#                                                  #"<<endl;
-    cout<< "#                                                  #"<<endl;
-    cout<< "#                                                  #"<<endl;
-    cout<< "#                                                  #"<<endl;
-    cout<< "####################################################"<<endl;
-
-    maze_l = 52;
-    maze_h = 16;
-}
-
-/*player function bodies*/
-void print_player()
-{
-    gotoxy(pX,pY);
-    cout<<"@";
-    
-
-}
-void erase_player()
-{
-    gotoxy(pX,pY);
-    cout<<" ";
-    
-
-}
-void move_player()
-{
-    erase_player();
-
     if(GetAsyncKeyState(VK_LEFT))
     {
-        player_direction='L';
-        if ((check_player_collisions() == true))
-            pX = pX-1;
-        
+        player_dir='L';
+        move_player();
     }
 
     if (GetAsyncKeyState(VK_RIGHT))
     {
-        player_direction='R';
-        if ((check_player_collisions() == true))
-            pX=pX+1;
-        
+        player_dir='R';
+        move_player();
     }
 
     if (GetAsyncKeyState(VK_UP))
     {
-        player_direction='U';
-        if (check_player_collisions() == true)
-            pY=pY-1;
-        
+        player_dir='U';
+        move_player();
     }
 
     if (GetAsyncKeyState(VK_DOWN))
     {
-        player_direction='D';
-        if (check_player_collisions() == true)
-            pY=pY+1;
-        
-
+        player_dir='D';
+        move_player();
     }
 
-    print_player();
-
 }
-bool check_player_collisions()
+void move_player()
 {
-    char check_character;
-// left input
-    if (player_direction == 'L')
-        {
-            check_character = getCharAtxy(pX-1,pY);
-            return player_movement_dictionary(check_character);
-        }
-// right input
-    if(player_direction == 'R')
-        {
-            check_character = getCharAtxy(pX+1,pY);
-            return player_movement_dictionary(check_character);
-        }
-// up input 
-
-    if(player_direction == 'U')
-        {
-            check_character = getCharAtxy(pX,pY-1);
-            return player_movement_dictionary(check_character);
-        }
-// down input
-
-    if(player_direction == 'D')
-        {
-            check_character = getCharAtxy(pX,pY+1);
-            return player_movement_dictionary(check_character);
-        }
 
 }
-bool player_movement_dictionary(char check_character)
+
+void initialize_maze(char screen[screen_height][screen_length])
 {
-    if (check_character == ' ')
-                return player_movable = true;
-            else if (check_character == '.')
-                return player_movable = true;
-            else 
-                return player_movable =false;
+    for (int y = 0;y <= screen_height;y++)
+    {
+        for(int x = 0;x <= screen_length;x++)
+        {
+            screen[y][x] = ' ';
+        }
+    }
+
+    // Draw borders
+    for (int x = 0; x < screen_length; x++)
+    {
+        screen[0][x] = '#';                                     // top row
+        screen[screen_height][x] = '#';                         // bottom row
+    }
+
+    for (int y = 0; y < screen_height; y++)
+    {
+        screen[y][0] = '#';                                     // leftmost column
+        screen[y][screen_length - 1] = '#';                     // rightmost column
+    }
+    screen[screen_height][screen_length] = '#';
 }
 
-/*enemy function bodies*/
-void print_spiky_boi()
+void printBoard(char screen[screen_height][screen_length])
 {
-    gotoxy(sX,sY);
-    
-    if (sFrame == true)
-        {
-            cout<<"x";
-        }
-    if (sFrame == false)
+    for (int y = 0;y <= screen_height;y++)
     {
-        cout<<"+";
+        for(int x = 0;x <= screen_length;x++)
+        {
+            cout << screen[y][x];
+        }
+        cout << endl;
     }
-    sFrame= !sFrame;
-}
-void erase_enemy()
-{
-    gotoxy(eX,eY);
-    cout<<" ";
-}
-void move_spiky_boi()
-{
-    eX = sX;
-    eY = sY;
-
-    erase_enemy();
-    if (spiky_boi_life == 100)
-    {
-        random_map_coordinates();
-        sX = rand_X_map;
-        sY = rand_Y_map;
-        sDir = random_diagonal_dir() ;
-        spiky_boi_life = 0 ;
-    }
-
-/*sDir = 4 is left movement*/
-    if ((getCharAtxy(sX-1,sY) == ' ' ) && (sDir == 4))
-    {
-        sX = sX - 1;
-        if ((getCharAtxy(sX-1,sY) == ' ' ) ==false)
-        {
-            sDir = 6;
-        }
-    }
-/*sDir = 6 is right movement*/
-    if (((getCharAtxy(sX+1,sY) == ' ' ) && sDir == 6))
-    {
-        sX = sX + 1;
-        if ((getCharAtxy(sX+1,sY) == ' ' ) == false)
-        {
-            sDir = 4;
-        }
-    }
-/*sDir = 2 is downward movement*/
-    if ((getCharAtxy(sX,sY+1) == ' ' ) && (sDir == 2))
-    {
-        sY = sY + 1;
-        if ((getCharAtxy(sX,sY+1) == ' ' ) == false)
-        {
-            sDir = 8;
-        }
-    }
-/*sDir = 8 is upward movement*/
-    if ((getCharAtxy(sX,sY-1) == ' ' ) && (sDir == 8))
-    {
-        sY = sY - 1;
-        if ((getCharAtxy(sX,sY-1) == ' ' ) == false)
-        {
-            sDir = 2;
-        }
-    }
-/*sDir = 3 is downright movement*/
-    if ((getCharAtxy(sX+1,sY+1) == ' ' ) && (sDir == 3))
-    {
-        sX = sX + 1;
-        sY = sY + 1;
-        if ((getCharAtxy(sX+1,sY+1) == ' ' ) == false)
-        {
-            sDir = random_diagonal_dir();
-        }
-    }
-/*sDir = 7 is upleft movement*/
-    if ((getCharAtxy(sX-1,sY-1) == ' ' ) && (sDir == 7))
-    {
-        sX = sX - 1;
-        sY = sY - 1;
-        if ((getCharAtxy(sX-1,sY-1) == ' ' ) == false)
-        {
-            sDir = random_diagonal_dir();
-        }
-    }
-/*sDir = 9 is upright movement*/
-    if ((getCharAtxy(sX+1,sY-1) == ' ' ) && (sDir == 9))
-    {
-        sX = sX + 1;
-        sY = sY - 1;
-        if ((getCharAtxy(sX+1,sY-1) == ' ' ) == false)
-        {
-            
-            sDir = random_diagonal_dir();
-        }
-    }
-/*sDir = 1 is downleft movement*/
-    if ((getCharAtxy(sX-1,sY+1) == ' ' ) && (sDir == 1))
-    {
-        sX = sX - 1;
-        sY = sY + 1;
-        if ((getCharAtxy(sX-1,sY+1) == ' ' ) == false)
-        {
-            sDir = random_diagonal_dir();
-        }
-    }
-
-    print_spiky_boi();
-
-    spiky_boi_life ++ ;
-
-}
-bool check_enemy_collisions()
-{
-     char check_character;
-// left movement
-    if (sDir == '4')
-        {
-            check_character = getCharAtxy(sX-1,sY);
-            return enemy_movement_dictionary(check_character);
-        }
-// right movement
-    if (sDir == '6')
-        {
-            check_character = getCharAtxy(sX+1,sY);
-            return enemy_movement_dictionary(check_character);
-        }
-// up movement
-
-    if (sDir == '8')
-        {
-            check_character = getCharAtxy(sX,sY-1);
-            return enemy_movement_dictionary(check_character);
-        }
-// down movement
-    if (sDir == '2')
-        {
-            check_character = getCharAtxy(sX,sY+1);
-            return enemy_movement_dictionary(check_character);
-        }
-// upleft movement
-    if (sDir == '7')
-        {
-            check_character = getCharAtxy(sX-1,sY-1);
-            return enemy_movement_dictionary(check_character);
-        }
-
-// upright movement
-    if (sDir == '9')
-        {
-            check_character = getCharAtxy(sX+1,sY-1);
-            return enemy_movement_dictionary(check_character);
-        }
-
-//downleft movement
-    if (sDir == '1')
-        {
-            check_character = getCharAtxy(sX-1,sY+1);
-            return enemy_movement_dictionary(check_character);
-        }
-// downright movement
-    if (sDir == '3')
-        {
-            check_character = getCharAtxy(sX+1,sY+1);
-            return enemy_movement_dictionary(check_character);
-        }
-
-
-}
-bool enemy_movement_dictionary(char check_character)
-{
-    if (check_character == ' ')
-                return enemy_movable = true;
-            else if (check_character == '.')
-                return enemy_movable = false;
-            else 
-                return enemy_movable =false;
 }
 
-/*test cases function bodies. dont mind .for debugging*/
-void test_case()
-{
- gotoxy(55, 4);
- cout <<" sX= "<<sX<<endl;
- gotoxy(55, 5);
- cout <<" sY= "<<sY<<endl;
- gotoxy(55, 6);
- cout <<" pX= "<<pX<<endl;
- gotoxy(55, 7);
- cout <<" pY= "<<pY<<endl;
- gotoxy(55, 8);
- cout <<" sframe= "<<sFrame<<endl;
- gotoxy(55, 9);
- cout <<" random= "<<rand_num<<endl;
- gotoxy(55, 10);
- cout <<" sDir= "<<sDir<<endl;
- gotoxy(55, 10);
- cout <<" spiky boi life "<<spiky_boi_life<<endl;
-}

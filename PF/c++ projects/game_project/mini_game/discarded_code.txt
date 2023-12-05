@@ -1,0 +1,25 @@
+    int y = 0;
+    for (int x = 0; x<=screen_length;x++)
+    {
+        screen[x][y] = '#' ;
+    }
+    y = screen_height;
+    for (int x = 0; x<=screen_length;x++)
+    {
+        screen[x][y] = '#' ;
+    }
+    int x = 0;
+    for (int y = 0; x<=screen_height;x++)
+    {
+        screen[x][y] = '#' ;
+    }
+    x = screen_height;
+    for (int y = 0; x<=screen_height;x++)
+    {
+        screen[x][y] = '#' ;
+    }
+
+
+
+
+

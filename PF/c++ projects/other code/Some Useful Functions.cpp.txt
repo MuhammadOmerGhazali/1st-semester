@@ -1,0 +1,44 @@
+void cursor_hide()
+{
+    /*
+        For Removing Blinking Cursor on Screen
+    */
+    HANDLE hStdOut = NULL;
+    CONSOLE_CURSOR_INFO curInfo;
+
+    hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    GetConsoleCursorInfo(hStdOut, &curInfo);
+    curInfo.bVisible = FALSE;
+    SetConsoleCursorInfo(hStdOut, &curInfo);
+}
+void cursor_show()
+{
+    /*
+        For Removing Blinking Cursor on Screen
+    */
+    HANDLE hStdOut = NULL;
+    CONSOLE_CURSOR_INFO curInfo;
+
+    hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    GetConsoleCursorInfo(hStdOut, &curInfo);
+    curInfo.bVisible = TRUE;
+    SetConsoleCursorInfo(hStdOut, &curInfo);
+}
+void resizeConsole()
+{
+    /*
+        Resize CMD console to desired Pixels
+    */
+    HWND console = GetConsoleWindow();
+    CONSOLE_FONT_INFOEX fontInfo;
+    fontInfo.cbSize = sizeof(CONSOLE_FONT_INFOEX);
+    GetCurrentConsoleFontEx(c, FALSE, &fontInfo);
+
+    // Decrease the font size to zoom out the console window
+    fontInfo.dwFontSize.X = fontInfo.dwFontSize.X - 2;
+    fontInfo.dwFontSize.Y = fontInfo.dwFontSize.Y - 2;
+
+    // Set the new console font information
+    SetCurrentConsoleFontEx(c, FALSE, &fontInfo);
+    ShowWindow(console, SW_MAXIMIZE);
+}
