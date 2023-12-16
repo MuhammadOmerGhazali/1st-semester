@@ -1,1 +1,2 @@
-clrscr()
+
+        Sleep( 150);
