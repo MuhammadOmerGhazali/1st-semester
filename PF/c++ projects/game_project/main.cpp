@@ -1,76 +1,281 @@
 #include <iostream>
 #include <windows.h>
 #include <conio.h>
+#include <ctime>
+#include <cstdlib>
 
 using namespace std;
 
-//constants
-const int screen_length = 70;
-const int screen_height = 25;
+const int screen_l=51;
+const int screen_h=37;
 
-//functions
-void ready(char screen[screen_height][screen_length]);                     // initializes the game state
-void resizeConsole();
+void print_Array(char screen[screen_h][screen_l]);
+void moveDown(char screen[screen_h][screen_l], char buffer[screen_h][screen_l], char randArrays[3][screen_h][screen_l]);
+int random_function(int x);
 void cursor_hide();
-void cursor_show();
-void initialize_maze(char screen[screen_height][screen_length]);           // initializes the maze 
-void printBoard(char screen[screen_height][screen_length]);
+void clearConsole();
 
-void detect_player_input();                                                // detects player input
-void move_player();                                                        // moves player
+HANDLE color = GetStdHandle(STD_OUTPUT_HANDLE);
 
-
-//player variables
-int player_x , player_y;
-char player_dir;
-
-
-int main()
+int main() 
 {
-    resizeConsole();                                                        // risize console
-    cursor_hide();                                                          // hide cursor
-    char screen[screen_height][screen_length];                              // array used to print screen
-    ready(screen);                                                          // initialize and the start screen
-    bool game_over = false ;                                                // used to terminate game loop
-    
-    while(!game_over)                                                       // game loop
+    char screen[screen_h][screen_l] = {"                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "           #####                                  ",
+                                       "          #     #   ##   #    # ######            ",
+                                       "          #        #  #  ##  ## #                 ",
+                                       "          #  #### #    # # ## # #####             ",
+                                       "          #     # ###### #    # #                 ",
+                                       "          #     # #    # #    # #                 ",
+                                       "           #####  #    # #    # ######            ",
+                                       "                                                  ",
+                                       "           #####                                  ",
+                                       "          #     # #####   ##   #####  #####       ",
+                                       "          #         #    #  #  #    #   #         ",
+                                       "           #####    #   #    # #    #   #         ",
+                                       "                #   #   ###### #####    #         ",
+                                       "          #     #   #   #    # #   #    #         ",
+                                       "           #####    #   #    # #    #   #         ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "              Lets Gooooooooooo!!!!!!!            ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  "};
+
+    char buffer[screen_h][screen_l] = {"                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  ",
+                                       "                                                  "};
+
+    char randArrays[3][screen_h][screen_l] = {{"                                                  ",
+                                               "                                                  ",
+                                               "   :=+:                                           ",
+                                               "  :***=-                                          ",
+                                               "                                                  ",
+                                               "                                                  ",
+                                               "                                                  ",
+                                               "                                    %#::::::*:    ", 
+                                               "                                   *:*==::-  :*   ",  
+                                               "                                   -::::::-=::*:= ",  
+                                               "                                   =::*=::+#::=-: ",  
+                                               "                                   ==::::::-::::= ",  
+                                               "                                    %=-*:::-=::*  ",  
+                                               "                                    :##+==--=#.   ",  
+                                               "                                                  ",
+                                               "                                                  ",
+                                               "                                                  ",
+                                               "                                                  ",
+                                               "                                                  ",
+                                               "                                                  ",
+                                               "                                                  ",
+                                               "                   +*#**+=--.                     ",  
+                                               "                 @##@%****=--                     ",  
+                                               "               *@@%*@%****=-                      ", 
+                                               "               .@@@%#******+=:                    ",  
+                                               "               :@@@@@@%**@%**                     ", 
+                                               "                 %@@@@@@@@@@@*=                   ",  
+                                               "                   .%@@@@@@%@#                    ",
+                                               "                                                  ",
+                                               "                                                  ",
+                                               "                                                  ",
+                                               "                                                  ",
+                                               "                                                  ",
+                                               "                                                  ",
+                                               "                                                  ",
+                                               "                                                  "},
+                                              {"                                           %@@@@@@",
+                                               "                                        =+%@@@@@@@",
+                                               "                                    +%@%##@@@@@@@@",
+                                               "                                 :#%@#*%@@@#@@@@@@",
+                                               "                              :%:#**###@@@@@@@@@@@",
+                                               "                            .**=+*%@@@@=*@@@@@@@@@",
+                                               "                           :====*=@@@@##@@@@@@@@@@",
+                                               "                          :*==+#*-=@@@@@=%@@@@@@@@",
+                                               "                         --+@@%*++@#@@#*#@@@@@@@@@",
+                                               "                       :=@@%@@@@@@%*#@##@@@@@@@@@@",
+                                               "                       -#@%*##@@@#@%@%@@@@@@@%@@@@",
+                                               "                      ::%##@*#@@%*@@@*%@@@@@@@@@@@",
+                                               "                     :-= =#@**%##@%*#@@@@%@@@@@@@@",
+                                               "                    ::--=*#@%@###%-#@@@@%=@@@@@@@@",
+                                               "                    :: --+%*#@%*@%**@@@@**@@@@@@@@",
+                                               "                    +-:::=%*@##@@@%*#@@@@@@@@@@@@@",
+                                               "                   :*+=#*:=%@%#@@@%@*@@@@@@@@@@@@@",
+                                               "                   :#**+==%@@@*%*@@@@@@@@@@@@@@@@@",
+                                               "                    %+=*%=*@@@@%@@@@@@@@@@%@@@@@@@",
+                                               "                    %@#%*=+%@@@%@@@@@@@@@@@@@@@@@@",
+                                               "                    +@+%##*#@@@@@@@@@%#@@@@@@@@@@@",
+                                               "                    .:%#@%#@@@@%@@@#@@@@@@@@@@@@@@",
+                                               "                     @@%@*%@@@#@@%@@@@@@@@@@@@@@@@",
+                                               "                      =@@%#@@@@@@@@#@@@@@@@@@@@@@@",
+                                               "                       :%@@@@@@@@@@@@@@@@@@@@@@@@@",
+                                               "                        :%@@@@@@@@@@@@@@@@@@@@@@@@",
+                                               "                         @@@@@@@@@@@@@@@@@@@@@@@@@",
+                                               "                          @@@@@@@@@@@@@@@@@@@@@@@@",
+                                               "                            @@@%@@@@@@@@@@@@@@@@@@",
+                                               "                             @@@@@@@@@@@@@@@@@@@@@",
+                                               "                              =@@@@@@@@@@@@@@@@@@@",
+                                               "                                .=%@@@@@@@@@@@@@@@",
+                                               "                                     -@@@@@@@@@@@@",
+                                               "                                             .#%@@",
+                                               "                                                  ",
+                                               "                                                  ",
+                                               "                                                  "},
+                                              {"                                                  ",
+                                               "                                                  ",
+                                               "         :===.                                    ", 
+                                               "     :#######+=                                   ",
+                                               "    =**###*+======:                               ",
+                                               "   =============**++====:                         ",
+                                               "  :=====*##*+=============:                       ",
+                                               " .=====*####*==============                       ",
+                                               " =+*====+++================-                      ",
+                                               "-=*+==============**=====*==                      ",
+                                               "-=+==========+**===+====**==                      ",
+                                               " ===+###+=====**===========                       ",
+                                               "  ===*##*=================                        ",
+                                               "   :=========+*====*#+==:                         ",
+                                               "     ==+*===**+====*+==                           ",
+                                               "      ==*=============                            ",
+                                               "      :============-                              ",
+                                               "       .:                                         ",
+                                               "                                                  ",
+                                               "                                                  ",
+                                               "                                                  ",
+                                               "                                                  ",
+                                               "                                                  ",
+                                               "                                                  ",
+                                               "                                                  ",
+                                               "                                     :=+:         ",
+                                               "                                    :***=-...     ",
+                                               "                                     :***=-###:=+:",
+                                               "                                    :***=-##:***=-",
+                                               "                                      .::!@@@##::.",
+                                               "                                     :=+:         ",
+                                               "                                    :***=-        ",
+                                               "                                                  ",
+                                               "                                                  ",
+                                               "                                                  ",
+                                               "                                                  "}};
+    cursor_hide();
+    while (true) 
     {
-        detect_player_input();                                              // detects player input and redirects to the required function
-
-        printBoard(screen);                                                 // print the screen
+        
+            clearConsole();
+            moveDown(screen, buffer, randArrays);
+            print_Array(screen);
+            Sleep( 150);
+        
     }
-    
 
-    cursor_show();                                                          // show the cursor again
+    return 0;
 }
 
-void ready(char screen[screen_height][screen_length])
-{
-    system("cls");
-    cout <<"Press any key to continue...................................";
-    getch();
-    system("cls");
-    initialize_maze(screen);
+
+void print_Array(char screen[screen_h][screen_l])
+ {
+    string temp = "";
+    SetConsoleTextAttribute(color, 8);
+    for (int i = 0; i < screen_h; ++i) 
+    {
+        for (int j = 0; j < screen_l; ++j) 
+        {
+            temp += screen[i][j];
+        }
+        temp += "\n";
+    }
+    cout << temp;
 }
 
-void resizeConsole()
+void moveDown(char screen[screen_h][screen_l], char buffer[screen_h][screen_l], char randArrays[3][screen_h][screen_l]) 
 {
-    COORD coord;
-    SMALL_RECT rect;
-    HWND console = GetConsoleWindow();
+    static int count = 0;  // Counter to track the number of times moveDown is called
 
-    coord.X = 100;  
-    coord.Y = 30;   
+    // Move each column one step down
+    for (int j = 0; j < screen_l; ++j) {
+        // Shift elements down in the buffer
+        for (int i = screen_h - 1; i > 0; --i) {
+            buffer[i][j] = buffer[i - 1][j];
+        }
+        // Move the last row from screen to the top of the buffer
+        // buffer[0][j] = screen[screen_h - 1][j];
 
-    rect.Left = 0;
-    rect.Top = 0;
-    rect.Right = coord.X - 1;   
-    rect.Bottom = coord.Y - 1;  
+        // Shift elements down in the screen
+        for (int i = screen_h - 1; i > 0; --i) {
+            screen[i][j] = screen[i - 1][j];
+        }
+        // Move the last row to the top
+        screen[0][j] = buffer[screen_h - 1][j];
+    }
 
-    SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-    SetConsoleWindowInfo(GetStdHandle(STD_OUTPUT_HANDLE), TRUE, &rect);
+    // Check if all elements in the buffer have moved down
+    if (++count % screen_h == 0) {
+        // Reset the counter
+        count = 0;
 
-    ShowWindow(console, SW_SHOWNORMAL);
+        // Randomly select an array from randArrays and move it to the buffer
+        int randIndex = random_function(3);
+        for (int i = 0; i < screen_h; ++i) {
+            for (int j = 0; j < screen_l; ++j) {
+                buffer[i][j] = randArrays[randIndex][i][j];
+            }
+        }
+    }
+}
+
+int random_function(int total_options)
+{
+    int return_int;
+    srand(time(0));
+    return_int =rand() % total_options ;
+    return return_int;
 }
 void cursor_hide()
 {
@@ -85,86 +290,8 @@ void cursor_hide()
     curInfo.bVisible = FALSE;
     SetConsoleCursorInfo(hStdOut, &curInfo);
 }
-void cursor_show()
+void clearConsole() 
 {
-    /*
-        For Removing Blinking Cursor on Screen
-    */
-    HANDLE hStdOut = NULL;
-    CONSOLE_CURSOR_INFO curInfo;
-
-    hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    GetConsoleCursorInfo(hStdOut, &curInfo);
-    curInfo.bVisible = TRUE;
-    SetConsoleCursorInfo(hStdOut, &curInfo);
+    COORD cursorPosition;	cursorPosition.X = 0;	cursorPosition.Y = 0;
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursorPosition);
 }
-
-void detect_player_input()
-{
-    if(GetAsyncKeyState(VK_LEFT))
-    {
-        player_dir='L';
-        move_player();
-    }
-
-    if (GetAsyncKeyState(VK_RIGHT))
-    {
-        player_dir='R';
-        move_player();
-    }
-
-    if (GetAsyncKeyState(VK_UP))
-    {
-        player_dir='U';
-        move_player();
-    }
-
-    if (GetAsyncKeyState(VK_DOWN))
-    {
-        player_dir='D';
-        move_player();
-    }
-
-}
-void move_player()
-{
-
-}
-
-void initialize_maze(char screen[screen_height][screen_length])
-{
-    for (int y = 0;y <= screen_height;y++)
-    {
-        for(int x = 0;x <= screen_length;x++)
-        {
-            screen[y][x] = ' ';
-        }
-    }
-
-    // Draw borders
-    for (int x = 0; x < screen_length; x++)
-    {
-        screen[0][x] = '#';                                     // top row
-        screen[screen_height][x] = '#';                         // bottom row
-    }
-
-    for (int y = 0; y < screen_height; y++)
-    {
-        screen[y][0] = '#';                                     // leftmost column
-        screen[y][screen_length - 1] = '#';                     // rightmost column
-    }
-    screen[screen_height][screen_length] = '#';
-}
-
-void printBoard(char screen[screen_height][screen_length])
-{
-    for (int y = 0;y <= screen_height;y++)
-    {
-        for(int x = 0;x <= screen_length;x++)
-        {
-            cout << screen[y][x];
-        }
-        cout << endl;
-    }
-}
-

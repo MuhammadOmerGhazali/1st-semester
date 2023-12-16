@@ -1,0 +1,12 @@
+make business application
+1
+change global arrays to local arrays
+1
+add file handling
+1
+make app documentation
+1
+add colors to application
+0
+fix crashes
+0
