@@ -1,13 +1,11 @@
 #include <iostream>
+#include <fstream>
 #include <conio.h>
+#include <limits>
 #include <windows.h>
 #include <string>
-#include <cmath>
-#include <limits>
-#include <fstream>
 
 using namespace std;
-
 int ascii_to_int(string convert_to_int);
 string get_string_input();
 void gotoxy(int x, int y);
@@ -18,8 +16,10 @@ string loginInput(string username_database[], string password_database[], string
 string sign_up(string username_database[], string password_database[], string user_perm[], string& employee_id, int &num_accounts);
 void store_signup_info(string username_database[], string password_database[], string user_perm[], const string& username, const string& password, const string& user_perm_value, const string& employee_id, int& num_accounts);
 void store_accounts(string username_database[], string password_database[], string user_perm[], int num_accounts);
-bool is_employee_id_exists(int enetered_employee_id, int num_accounts, const string username_database[]);
+bool is_employee_id_exists(const string& employee_id);
 void load_accounts(string username_database[], string password_database[], string user_perm[], int& num_accounts);
+void storeUserData(string names[], string password[], string userClass[], int indexCount);
+void readUserData(string names[], string password[], string userClass[], int &indexCount);
 void admin_page(int task_num, bool taskdone_pr[20], string tasklist_pr[20], int taskid_pr, string current_user_perms, string username_database[]);
 void employee_page(int task_num, bool taskdone_pr[20], string tasklist_pr[20], int taskid_pr, string current_user_perms, string username_database[]);
 void add_tasks(int task_num, bool taskdone_pr[20], string tasklist_pr[20], int taskid_pr, string current_user_perms, string username_database[]);
@@ -28,11 +28,15 @@ void view_task(int task_num, bool taskdone_pr[20], string tasklist_pr[20], int t
 void mark_task_done(int task_num, bool taskdone_pr[20], string tasklist_pr[20], int taskid_pr, string current_user_perms, string username_database[]);
 void store_tasks(string tasklist_pr[], bool taskdone_pr[], string username_database[], int taskid_pr);
 void load_tasks(string tasklist_pr[], bool taskdone_pr[], string completed_by[], int &taskid_pr);
-string sign_in(string username_database[], string password_database[], string user_perm[], string& employee_id, int num_accounts);
+string sign_in(string username_database[], string password_database[], string user_perm[], string employee_id, int num_accounts);
 void validation_fail();
 bool login_Input_validation(string option);
 bool sign_up_validation(string option);
 void invalid_credentials(string username_database[], string password_database[], string user_perm[], string employee_id, int num_accounts);
+void readUserData(string names[],string password[],string userClass[],int &indexCount);
+void storeUserData(string names[],string password[],string userClass[],int indexCount);
+string getField(string get,int field);
+
 
 int main()
 {
@@ -61,20 +65,20 @@ int main()
     ready(username_database, password_database, user_perm, employee_id, taskdone_pr, tasklist_pr);
     load_accounts(username_database, password_database, user_perm, num_accounts);
     bool loggedIn = false;
-    while (!loggedIn)
+    while (!loggedIn) 
     {
         // Calling loginMenu, storing the return value
         current_user_perms = loginMenu(username_database, password_database, user_perm, employee_id, num_accounts);
 
         // Check the user type and display the respective page
-        if (current_user_perms == "admin" || current_user_perms == "employee")
+        if (current_user_perms == "admin" || current_user_perms == "employee") 
         {
             loggedIn = true;
-            if (current_user_perms == "admin")
+            if (current_user_perms == "admin") 
             {
                 admin_page(task_num, taskdone_pr, tasklist_pr, taskid_pr, current_user_perms, username_database);
-            }
-            else
+            } 
+            else 
             {
                 employee_page(task_num, taskdone_pr, tasklist_pr, taskid_pr, current_user_perms, username_database);
             }
@@ -128,13 +132,6 @@ cout << "|----------------------------------------------------------------------
 
 void ready(string username_database[],string password_database[],string user_perm[],string employee_id,bool taskdone_pr[],string tasklist_pr[])
 {
-
-
-    for (int x =0 ;x < 10 ;x++)
-    {
-        username_database[x] = "0";
-        password_database[x] = "0";
-    }
     for (int x =0 ;x < 20 ;x++)
     {
         taskdone_pr[x] = false;
@@ -145,12 +142,6 @@ void ready(string username_database[],string password_database[],string user_per
         taskdone_pr[x] = false;
 
     }
-
-    username_database[0] = "admin";
-    password_database[0] = "admin";
-    user_perm[0] = "admin";
-    employee_id = "0";
-
     system ( "cls" );
 }
 
@@ -219,7 +210,7 @@ string sign_up(string username_database[], string password_database[], string us
     cin >> employee_id;
     temp_int = ascii_to_int(employee_id);
 
-    if (is_employee_id_exists(employee_id, num_accounts, username_database))
+    if (is_employee_id_exists(employee_id))
     {
         cout << "Employee ID already exists. Please choose a different one." << endl;
         validation_fail();
@@ -236,10 +227,9 @@ string sign_up(string username_database[], string password_database[], string us
     string option = user_perm[temp_int];
     if (sign_up_validation(option))
     {
-        // Increment num_accounts after a successful sign-up
-        num_accounts++;
         // Store the sign-up information
         store_signup_info(username_database, password_database, user_perm, username_database[temp_int], password_database[temp_int], user_perm[temp_int], employee_id, num_accounts);
+        num_accounts++;
         // Return to the login menu
         return loginMenu(username_database, password_database, user_perm, employee_id, num_accounts);
     }
@@ -250,10 +240,11 @@ string sign_up(string username_database[], string password_database[], string us
         return sign_up(username_database, password_database, user_perm, employee_id, num_accounts);
     }
 }
+
 void store_signup_info(string username_database[], string password_database[], string user_perm[], const string& username, const string& password, const string& user_perm_value, const string& employee_id, int& num_accounts)
 {
     // Check if the employee ID already exists
-    if (is_employee_id_exists(employee_id, num_accounts, username_database))
+    if (is_employee_id_exists(employee_id))
     {
         cout << "Employee ID already exists. Please choose a different one." << endl;
         return;
@@ -287,89 +278,72 @@ void store_signup_info(string username_database[], string password_database[], s
     // Increment num_accounts after a successful sign-up
     num_accounts++;
 }
+
 void store_accounts(string username_database[], string password_database[], string user_perm[], int num_accounts)
 {
-    ofstream outputFile("accounts.txt");
-
-    if (outputFile.is_open())
-    {
-        for (int i = 0; i < num_accounts; i++)
-        {
-            outputFile << username_database[i] << " " << password_database[i] << " " << user_perm[i] << endl;
-        }
-
-        outputFile.close();
-    }
+    storeUserData(username_database, password_database, user_perm, num_accounts);
 }
-void load_accounts(string username_database[], string password_database[], string user_perm[], int& num_accounts)
+void load_accounts(string username_database[], string password_database[], string user_perm[], int &num_accounts)
 {
-    ifstream inputFile("accounts.txt");
-
-    if (inputFile.is_open())
-    {
-        // Clear existing accounts before loading
-        num_accounts = 0;
-        while (!inputFile.eof())
-        {
-            inputFile >> username_database[num_accounts] >> password_database[num_accounts] >> user_perm[num_accounts];
-            inputFile.ignore(); // Ignore newline character
-
-            num_accounts++;
-
-            if (num_accounts >= 10)
-            {
-                break; // Break if the array is full
-            }
-        }
-
-        inputFile.close();
-    }
+    readUserData(username_database, password_database, user_perm, num_accounts);
 }
-string sign_in(string username_database[], string password_database[], string user_perm[], string& employee_id, int num_accounts)
+string sign_in(string username_database[], string password_database[], string user_perm[], string employee_id, int num_accounts)
 {
-    string entered_username, entered_password;
+    string entered_username,entered_password;
     string current_user_perms;
     int entered_employee_id;
     string option;
-    system("cls");
+    system ( "cls" );
     printHeader();
     cout << endl;
     cout << "ENTER EMPLOYEE ID :- ";
     cin >> employee_id;
     entered_employee_id = ascii_to_int(employee_id);
-    // Check if the entered employee_id exists in the accounts.txt file
-    if (!is_employee_id_exists(entered_employee_id, num_accounts, username_database))
-    {
-        cout << "Employee ID not found. Please check your input." << endl;
-        validation_fail();
-        return loginMenu(username_database, password_database, user_perm, employee_id, num_accounts);
-    }
-
     cout << "ENTER USERNAME :- ";
     cin >> entered_username;
     cout << "ENTER PASSWORD :- ";
     cin >> entered_password;
-    cout << endl;
+    cout <<endl;
     cout << "press any key to continue";
     getch();
-    
-    // Validate entered credentials
     if ((entered_username == username_database[entered_employee_id]) && (entered_password == password_database[entered_employee_id]))
     {
-        if (user_perm[entered_employee_id] == "admin")
+        if (user_perm[entered_employee_id]=="admin")
             current_user_perms = "admin";
-        else if ((user_perm[entered_employee_id] == "programmar") || (user_perm[entered_employee_id] == "artist"))
+        if ((user_perm[entered_employee_id]=="programmar") || (user_perm[entered_employee_id]=="artist"))
             current_user_perms = "employee";
     }
     else
     {
         invalid_credentials(username_database, password_database, user_perm, employee_id, num_accounts);
+
     }
-    
     return current_user_perms;
 }
+bool is_employee_id_exists(const string& employee_id)
+{
+    ifstream inputFile("signup_info.txt");
 
+    if (inputFile.is_open())
+    {
+        string stored_employee_id;
+        while (inputFile >> stored_employee_id)
+        {
+            if (stored_employee_id == employee_id)
+            {
+                inputFile.close();
+                return true; // Employee ID already exists
+            }
 
+            // Skip the rest of the line
+            inputFile.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+
+        inputFile.close();
+    }
+
+    return false; // Employee ID doesn't exist
+}
 void admin_page(int task_num, bool taskdone_pr[20], string tasklist_pr[20], int taskid_pr, string current_user_perms, string username_database[])
 {
     system ( "cls" );
@@ -446,7 +420,42 @@ void employee_page(int task_num, bool taskdone_pr[20], string tasklist_pr[20], i
         employee_page(task_num, taskdone_pr, tasklist_pr, taskid_pr, current_user_perms, username_database);
     }
 }
-
+void readUserData(string names[],string password[],string userClass[],int &indexCount)
+{
+    string get = "";
+    fstream readFile;
+    readFile.open("accounts.txt",ios::in);
+    if (readFile.fail())
+    {
+        return;
+    }
+    while (!readFile.eof())
+    {
+        getline(readFile,get);
+        names[indexCount] = getField(get , 1);
+        password[indexCount] = getField(get , 2);
+        userClass[indexCount] = getField(get , 3);
+        indexCount++;
+    }
+    readFile.close();
+}
+void storeUserData(string names[],string password[],string userClass[],int indexCount)
+{
+    fstream StoreUsers;
+    StoreUsers.open("accounts.txt",ios::out);
+    for (int i=0; i<indexCount; i++)
+    {
+        if (i == indexCount - 1)
+        {
+            StoreUsers << names[i] <<"," <<password[i] <<"," << userClass[i];
+        }
+        else
+        {
+            StoreUsers << names[i] <<"," <<password[i] <<"," << userClass[i] << "\n";
+        }
+    }
+    StoreUsers.close();
+}
 //tasklist functions
 void add_tasks(int task_num, bool taskdone_pr[20], string tasklist_pr[20], int taskid_pr, string current_user_perms, string username_database[])
 {
@@ -671,7 +680,27 @@ void load_tasks(string tasklist_pr[], bool taskdone_pr[], string completed_by[],
         inputFile.close();
     }
 }
-
+string getField(string get,int field)
+{
+    int commaCount = 1;
+    string result = "";
+    for (int x=0; x<get.length();x++)
+    {
+        if (get[x]==',')
+        {
+            commaCount = commaCount + 1;
+        }
+        else if(commaCount == field)
+        {
+            result = result + get[x]; 
+        } 
+        else if (commaCount > field)
+        {
+            break;
+        }
+    }
+    return result;
+}
 //validation functions
 void validation_fail()
 {

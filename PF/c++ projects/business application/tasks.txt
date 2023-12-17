@@ -1,19 +1,2 @@
-task 1|0||1|admin|0|
-task 2|1|admin
-task 3|0|
-task 4|0|
-|0|
-|0|
-|0|
-|0|
-|0|
-|0|
-|0|
-|0|
-|0|
-|0|
-|0|
-|0|
-|0|
-|0|
-|0|
+task 1 for usman  | 1
+task 2 for usman  | 1
