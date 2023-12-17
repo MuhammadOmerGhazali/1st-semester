@@ -13,9 +13,10 @@ const int screen_h=37;
 // player variables
 const int return_coordinates[2]= {25,25};
 int player_coordinates[2]={25,25};
-const int accel_factor=1.5;
-const int deaccel_fator=0.5;
+const int accel_factor=1;
+const int deaccel_fator=2;
 int player_speed=0;
+char player=219;
 
 HANDLE color = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -37,7 +38,7 @@ void erase_player(char screen[screen_h][screen_l]);
 void print_player(char screen[screen_h][screen_l]);
 void move_player(char screen[screen_h][screen_l], int direction,bool input);
 void check_player_input(char screen[screen_h][screen_l]);
-
+void player_visuals();
 char checkCollision(char screen[screen_h][screen_l], int x, int y);
 
 // ui functions
@@ -50,24 +51,24 @@ int main()
                                        "#                                                #",
                                        "#                                                #",
                                        "#                                                #",
-                                       "#          #####                                 #",
-                                       "#         #     #   ##   #    # ######           #",
-                                       "#         #        #  #  ##  ## #                #",
-                                       "#         #  #### #    # # ## # #####            #",
-                                       "#         #     # ###### #    # #                #",
-                                       "#         #     # #    # #    # #                #",
-                                       "#          #####  #    # #    # ######           #",
-                                       "#                                                #",
-                                       "#          #####                                 #",
-                                       "#         #     # #####   ##   #####  #####      #",
-                                       "#         #         #    #  #  #    #   #        #",
-                                       "#          #####    #   #    # #    #   #        #",
-                                       "#               #   #   ###### #####    #        #",
-                                       "#         #     #   #   #    # #   #    #        #",
-                                       "#          #####    #   #    # #    #   #        #",
                                        "#                                                #",
                                        "#                                                #",
-                                       "#             Lets Gooooooooooo!!!!!!!           #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
                                        "#                                                #",
                                        "#                                                #",
                                        "#                                                #",
@@ -121,7 +122,43 @@ int main()
                                        "#                                                #",
                                        "#                                                #",
                                        "#                                                #"};
-
+    char Gameover_screen[screen_h][screen_l] = {"#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#           Game               Over              #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#         press any key to continue              #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #",
+                                       "#                                                #"};
     char randArrays[3][screen_h][screen_l] = {{"#                                                #",
                                                "#                                                #",
                                                "#  :=+:                                          #",
@@ -232,28 +269,29 @@ int main()
                                                "#                                                #",
                                                "#                                                #"}};
     cursor_hide();
-    while (true) 
+    bool game_on=true;
+    while (game_on) 
     {
         
         clearConsole();
-        check_player_input(screen);
+        check_player_input(screen);        
+        print_Array(screen);
+        player_visuals();
         moveDown(screen, buffer, randArrays);
-        // Check for collision after moving the player
         char collidedChar = checkCollision(screen, player_coordinates[0], player_coordinates[1]);
 
         if (collidedChar != ' ') 
         {
-            // Handle collision, for example, end the game or perform some action
-            cout << "Collision with character: " << collidedChar << endl;
-            break; // You can modify this part based on your game logic
+            game_on=false;
         }
-
-        print_Array(screen);
+        SetConsoleTextAttribute(color, 8);
         testcases();
-        Beep(800,150);
+        Beep(600,50);
         
     }
-
+    clearConsole();
+    print_Array(Gameover_screen);
+    getch();
     return 0;
 }
 //general use functions
@@ -302,7 +340,6 @@ void print_Array(char screen[screen_h][screen_l])
  {
     string temp = "";
     print_border();
-    SetConsoleTextAttribute(color, 8);
     for (int i = 0; i < screen_h; ++i) 
     {
         for (int j = 0; j < screen_l; ++j) 
@@ -367,17 +404,7 @@ void check_player_input(char screen[screen_h][screen_l])
         input = true;
         move_player(screen,1,input);
     }
-    else if(player_coordinates[1]<return_coordinates[1])
-    {
-        input = false;
-        move_player(screen,1,input);
-    }
-    else if(player_coordinates[1]>return_coordinates[1])
-    {
-        input = false;
-        move_player(screen,-1,input);
-    }
-    else if(player_coordinates[1]==return_coordinates[1])
+    else 
     {
         input = false;
         move_player(screen,0,input);
@@ -391,35 +418,59 @@ void print_player(char screen[screen_h][screen_l])
 {
     screen[player_coordinates[0]][player_coordinates[1]] = '*';
 }
-void move_player(char screen[screen_h][screen_l], int direction,bool input)
+void move_player(char screen[screen_h][screen_l], int direction, bool input)
 {
     // Erase the player from the current position
-    erase_player(screen); 
+    erase_player(screen);
+
     if (input)
     {
-        player_speed += static_cast <int>(direction*accel_factor);
-        // Move the player based on the direction
+        player_speed += static_cast<int>(direction * accel_factor);
+        // Limit the player_speed to a maximum value of 5
+        player_speed = min(player_speed, 5);
         player_coordinates[1] += player_speed;
     }
     else
     {
-        player_speed += static_cast <int>(direction*deaccel_fator);
+        // If there is no input, move the player towards return_coordinates[1]
+        if (player_coordinates[1] < return_coordinates[1])
+        {
+            direction = 1;
+        }
+        else if (player_coordinates[1] > return_coordinates[1])
+        {
+            direction = -1;
+        }
+
+        player_speed += static_cast<int>(direction / deaccel_fator);
+        // Limit the player_speed to a maximum value of 5
+        player_speed = min(player_speed, 5);
         player_coordinates[1] += player_speed;
     }
-    // Check for boundaries to prevent the player from going off the screen
 
-    if (player_coordinates[1] < 1) {
-            player_coordinates[1] = 1;
-        }
-    else if (player_coordinates[1] >= screen_l-3) 
-        {
-            player_coordinates[1] = screen_l - 3;
-        }
+    // Check for boundaries to prevent the player from going off the screen
+    if (player_coordinates[1] < 1)
+    {
+        player_coordinates[1] = 1;
+        player_speed = 0;
+    }
+    else if (player_coordinates[1] >= screen_l - 3)
+    {
+        player_coordinates[1] = screen_l - 3;
+        player_speed = 0;
+    }
 
     print_player(screen);
 }
 
-
+void player_visuals()
+{
+    gotoxy(player_coordinates[1]-1,player_coordinates[0]);
+    SetConsoleTextAttribute(color, 15);
+    cout<<char(220)<<char(219)<<char(220);
+    gotoxy(player_coordinates[1],player_coordinates[0]-1);
+    cout<<char(206);
+}
 // Collision detection function
 char checkCollision(char screen[screen_h][screen_l], int x, int y) 
 {
@@ -441,6 +492,8 @@ void testcases()
     gotoxy(screen_l+2,3);
     cout<<"Returning X:- "<<return_coordinates[1];
     gotoxy(screen_l+2,4);
-    cout<<"Returning Y:- "<<return_coordinates[0];    
+    cout<<"Returning Y:- "<<return_coordinates[0];   
+    gotoxy(screen_l+2,5);
+    cout<<"Player speed:- "<<player_speed;   
 
 }
