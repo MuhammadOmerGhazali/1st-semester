@@ -5,7 +5,7 @@
 #include <windows.h>
 
 using namespace std;
-
+//constants
 const int MAX_TASKS = 20;
 const int MAX_REQUESTS = 20;
 const int MAX_USERS = 10;
@@ -34,19 +34,19 @@ int ascii_to_int(string convert_to_int);
 
 int main() {
 
-    string usernames[MAX_USERS];
-    string passwords[MAX_USERS];
-    string requestList[MAX_REQUESTS];
-    int userCount = 0;
-    int requestCount = 0;
+    string usernames[MAX_USERS];            //used to store usernames
+    string passwords[MAX_USERS];            //used to store passwords
+    string requestList[MAX_REQUESTS];       //used to store requests
+    int userCount = 0;                      //used to store user count
+    int requestCount = 0;                   //used to store requst numbers
 
-    loadUsersFromFile(usernames, passwords, userCount);
-    string temp_choice;
-    int choice;
-    string currentUser;
+    loadUsersFromFile(usernames, passwords, userCount);             //load userlist form file
+    string temp_choice;                                             //used to store the below choice temporarily
+    int choice;                                                     //is used for the case change
+    string currentUser;                                             //is used to store the current user
 
-    do {
-        system("cls");
+    do {                                                            //Do while loop is better to use for such cases
+        system("cls");                                              //Code for the login menu
         SetConsoleTextAttribute(color, 9);
         cout << "\n======================== User Authentication =======================" << endl<<endl;
         SetConsoleTextAttribute(color, 14);
@@ -60,7 +60,7 @@ int main() {
         choice=ascii_to_int(temp_choice);
         switch (choice) {
             case 1:
-                if (authenticateUser(usernames, passwords, userCount, currentUser)) {
+                if (authenticateUser(usernames, passwords, userCount, currentUser)) {   //this function authenticates user and checks if he has entered the name creds
                     cout << "Welcome, " << currentUser << "!" << endl;
 
                     string taskList[MAX_TASKS];
@@ -74,7 +74,7 @@ int main() {
                     string temp_taskchoice;
                     int taskChoice;
 
-                    do {
+                    do {                                                                //second do while loop for user specific menu
                         system("cls");
                         SetConsoleTextAttribute(color, 9);
                         cout << "\n====================          To-Do List         ====================" << endl<<endl;
@@ -92,8 +92,8 @@ int main() {
                         SetConsoleTextAttribute(color, 14);
                         cin >> temp_taskchoice;
                         taskChoice = ascii_to_int(temp_taskchoice);
-                        switch (taskChoice) {
-                            case 1: {
+                        switch (taskChoice) {                                          //switch statement to redirect to the required function
+                            case 1: {                   
                                 system("cls");
                                 string newTask;
                                 SetConsoleTextAttribute(color, 9);
@@ -188,7 +188,7 @@ int main() {
                     getch();
                 }
                 break;
-            case 2: {
+            case 2: {                                       //case for sign up
                 SetConsoleTextAttribute(color, 9);
                 string newUsername, newPassword;
                 cout << "Enter new username: ";
@@ -199,15 +199,15 @@ int main() {
                 SetConsoleTextAttribute(color, 14);
                 cin >> newPassword;
 
-                addUser(usernames, passwords, userCount, newUsername, newPassword);
-                saveUsersToFile(usernames, passwords, userCount);
+                addUser(usernames, passwords, userCount, newUsername, newPassword);     //used to add user
+                saveUsersToFile(usernames, passwords, userCount);                       //used to save the added user details to file
                 break;
             }
-            case 3:
+            case 3:                                                                     //exit program case
             SetConsoleTextAttribute(color, 14);
                 cout << "Goodbye!" << endl;
                 break;
-            default:
+            default:                                                                    //validation
                 SetConsoleTextAttribute(color, 12);
                 cout << "Invalid choice. Please try again." << endl;
                 getch();
