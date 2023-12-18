@@ -18,6 +18,10 @@ const int deaccel_fator=2;
 int player_speed=0;
 char player=219;
 
+int score = 0;
+int canon_fuel = 0;
+char score_fuel = 30;
+
 HANDLE color = GetStdHandle(STD_OUTPUT_HANDLE);
 
 //general use functions
@@ -40,6 +44,7 @@ void move_player(char screen[screen_h][screen_l], int direction,bool input);
 void check_player_input(char screen[screen_h][screen_l]);
 void player_visuals();
 char checkCollision(char screen[screen_h][screen_l], int x, int y);
+bool scoreCollision(char screen[screen_h][screen_l], int x, int y);
 
 // ui functions
 void testcases();
@@ -84,7 +89,6 @@ int main()
                                        "#                                                #",
                                        "#                                                #",
                                        "#                                                #"};
-
     char buffer[screen_h][screen_l] = {"#                                                #",
                                        "#                                                #",
                                        "#                                                #",
@@ -159,51 +163,51 @@ int main()
                                        "#                                                #",
                                        "#                                                #",
                                        "#                                                #"};
-    char randArrays[3][screen_h][screen_l] = {{"#                                                #",
-                                               "#                                                #",
-                                               "#  :=+:                                          #",
-                                               "# :***=-                                         #",
-                                               "#                                                #",
-                                               "#                                                #",
-                                               "#                                                #",
+    char randArrays[3][screen_h][screen_l] = {{"#                        6                       #",
+                                               "#                          6                     #",
+                                               "#  :=+:                        6                 #",
+                                               "# :***=-                        6                #",
+                                               "#                               6                #",
+                                               "#                           6                    #",
+                                               "#                         6                      #",
                                                "#                                   %#::::::*:   #", 
-                                               "#                                  *:*==::-  :*  #",  
-                                               "#                                  -::::::-=::*:=#",  
-                                               "#                                  =::*=::+#::=-:#",  
-                                               "#                                  ==::::::-::::=#",  
-                                               "#                                   %=-*:::-=::* #",  
+                                               "#                        6         *:*==::-  :*  #",  
+                                               "#      %#::::::*                  -::::::-=::*:=#",  
+                                               "#  .@@@%#******          6         =::*=::+#::=-:#",  
+                                               "# =::*=::+#::=-                    ==::::::-::::=#",  
+                                               "#      -*:::-=::*        6           %=-*:::-=::*#",  
                                                "#                                   :##+==--=#.  #",  
+                                               "#                          6                     #",
                                                "#                                                #",
+                                               "#                            6                   #",
                                                "#                                                #",
+                                               "#                                 6              #",
+                                               "#                                     6          #",
                                                "#                                                #",
-                                               "#                                                #",
-                                               "#                                                #",
-                                               "#                                                #",
-                                               "#                                                #",
-                                               "#                  +*#**+=--.                    #",  
+                                               "#                  +*#**+=--.           6        #",  
                                                "#                @##@%****=--                    #",  
                                                "#              *@@%*@%****=-                     #", 
-                                               "#              .@@@%#******+=:                   #",  
+                                               "#              .@@@%#******+=:            6      #",  
                                                "#              :@@@@@@%**@%**                    #", 
                                                "#                %@@@@@@@@@@@*=                  #",  
-                                               "#                  .%@@@@@@%@#                   #",
+                                               "#                  .%@@@@@@%@#            6      #",
                                                "#                                                #",
-                                               "#                                                #",
-                                               "#                                                #",
-                                               "#                                                #",
-                                               "#                                                #",
-                                               "#                                                #",
-                                               "#                                                #",
-                                               "#                                                #"},
-                                              {"#                                          %@@@@@#",
-                                               "#                                       =+%@@@@@@#",
-                                               "#                                   +%@%##@@@@@@@#",
-                                               "#                                :#%@#*%@@@#@@@@@#",
-                                               "#                             :%:#**###@@@@@@@@@@#",
-                                               "#                           .**=+*%@@@@=*@@@@@@@@#",
-                                               "#                          :====*=@@@@##@@@@@@@@@#",
-                                               "#                         :*==+#*-=@@@@@=%@@@@@@@#",
-                                               "#                        --+@@%*++@#@@#*#@@@@@@@@#",
+                                               "#                                      6         #",
+                                               "#                                 6              #",
+                                               "#                              6                 #",
+                                               "#                            6                   #",
+                                               "#                          6                     #",
+                                               "#                         6                      #",
+                                               "#                        6                       #"},
+                                              {"#                     6                    %@@@@@#",
+                                               "#                    6                  =+%@@@@@@#",
+                                               "#                  6                +%@%##@@@@@@@#",
+                                               "#                6               :#%@#*%@@@#@@@@@#",
+                                               "#               6             :%:#**###@@@@@@@@@@#",
+                                               "#              6            .**=+*%@@@@=*@@@@@@@@#",
+                                               "#            6             :====*=@@@@##@@@@@@@@@#",
+                                               "#           6             :*==+#*-=@@@@@=%@@@@@@@#",
+                                               "#          6             --+@@%*++@#@@#*#@@@@@@@@#",
                                                "#                      :=@@%@@@@@@%*#@##@@@@@@@@@#",
                                                "#                      -#@%*##@@@#@%@%@@@@@@@%@@@#",
                                                "#                     ::%##@*#@@%*@@@*%@@@@@@@@@@#",
@@ -267,8 +271,7 @@ int main()
                                                "#                                                #",
                                                "#                                                #",
                                                "#                                                #",
-                                               "#                                                #"}};
-    cursor_hide();
+                                               "#                                                #"}};cursor_hide();
     bool game_on=true;
     while (game_on) 
     {
@@ -280,13 +283,18 @@ int main()
         moveDown(screen, buffer, randArrays);
         char collidedChar = checkCollision(screen, player_coordinates[0], player_coordinates[1]);
 
-        if (collidedChar != ' ') 
+        if (collidedChar != ' ' && collidedChar != '6' && collidedChar != '8') 
         {
             game_on=false;
         }
+        if (scoreCollision(screen, player_coordinates[0], player_coordinates[1]))
+        {
+            score += 1;
+            canon_fuel += 1;
+        }
         SetConsoleTextAttribute(color, 8);
         testcases();
-        Beep(600,50);
+        Beep(100,80);
         
     }
     clearConsole();
@@ -344,7 +352,11 @@ void print_Array(char screen[screen_h][screen_l])
     {
         for (int j = 0; j < screen_l; ++j) 
         {
-            temp += screen[i][j];
+            if (screen[i][j]=='6')
+            {
+                temp += score_fuel;
+            }
+            else {temp += screen[i][j];}
         }
         temp += "\n";
     }
@@ -482,6 +494,17 @@ char checkCollision(char screen[screen_h][screen_l], int x, int y)
     // If no collision, return a space character
     return ' ';
 }
+bool scoreCollision(char screen[screen_h][screen_l], int x, int y)
+{
+    if (screen[x][y] == '6' || screen[x][y-1] == '6' || screen[x][y+1] == '6') 
+    {
+        screen[x][y] = ' ';
+        screen[x][y-1] = ' ';
+        screen[x][y+1] = ' ';
+        return true;
+    }
+    else return false;
+}
 // ui functions
 void testcases()
 {
@@ -495,5 +518,8 @@ void testcases()
     cout<<"Returning Y:- "<<return_coordinates[0];   
     gotoxy(screen_l+2,5);
     cout<<"Player speed:- "<<player_speed;   
-
+    gotoxy(screen_l+2,6);
+    cout<<"Score:- "<<score;   
+    gotoxy(screen_l+2,7);
+    cout<<"canon fuel "<<canon_fuel;
 }
